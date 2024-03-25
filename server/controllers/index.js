@@ -230,53 +230,43 @@ const setDog = async (req, res) => {
 
 // Function to handle searching a dog and incrementing it's age if it is found.
 const increaseAge = async (req, res) => {
-  
-  /* When the user makes a POST request, bodyParser populates req.body with the parameters
-     as we saw in setName() above. In the case of searchName, the user is making a GET request.
-     GET requests do not have a body, but they can have query parameters. bodyParser will also
-     handle these, and store them in req.query instead.
 
-     If the user does not give us a name to search by, throw an error.
-  */
-     if (!req.body.name) {
-      return res.status(400).json({ error: 'Name is required to perform a search' });
-    }
-  
-    /* If they do give us a name to search, we will as the database for a cat with that name.
-       Remember that since we are interacting with the database, we want to wrap our code in a
-       try/catch in case the database throws an error or doesn't respond.
-    */
-    let doc;
-    try {
-      doc = await Dog.findOne({ name: req.body.name }).exec();
-    } catch (err) {
-      // If there is an error, log it and send the user an error message.
-      console.log(err);
-      return res.status(500).json({ error: 'Something went wrong' });
-    }
-  
-    // If we do not find something that matches our search, doc will be empty.
-    if (!doc) {
-      return res.status(404).json({ error: 'No Dogs found' });
-    }
-  
-    const updatePromise = Dog.findOneAndUpdate({name: req.body.name}, { $inc: { age: 1 } }, {
-      returnDocument: 'after',
-      sort: { createdDate: 'descending' },
-    }).lean().exec();
-  
-    // If we successfully save/update them in the database, send back the cat's info.
-    updatePromise.then((doc) => res.json({
-      name: doc.name,
-      age: doc.age,
-    }));
-  
-    // If something goes wrong saving to the database, log the error and send a message to the client.
-    updatePromise.catch((err) => {
-      console.log(err);
-      return res.status(500).json({ error: 'Something went wrong' });
-    });
-    
+  if (!req.body.name) {
+    return res.status(400).json({ error: 'Name is required to perform a search' });
+  }
+
+  let doc2;
+  try {
+    doc2 = await Dog.findOne({ name: req.body.name }).exec();
+  } catch (err) {
+    // If there is an error, log it and send the user an error message.
+    console.log(err);
+    return res.status(500).json({ error: 'Something went wrong' });
+  }
+
+  // If we do not find something that matches our search, doc will be empty.
+  if (!doc2) {
+    return res.status(404).json({ error: 'No Dogs found' });
+  }
+
+  const updatePromise = Dog.findOneAndUpdate({ name: req.body.name }, { $inc: { age: 1 } }, {
+    returnDocument: 'after',
+    sort: { createdDate: 'descending' },
+  }).lean().exec();
+
+  // If we successfully save/update them in the database, send back the cat's info.
+  updatePromise.then((doc) => res.json({
+    name: doc.name,
+    age: doc.age,
+  }));
+
+  // If something goes wrong saving to the database, log the error and send a message to the client.
+  updatePromise.catch((err) => {
+    console.log(err);
+    return res.status(500).json({ error: 'Something went wrong' });
+  });
+
+  return res.status(200);
 };
 
 // Function to handle searching a cat by name.
