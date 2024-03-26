@@ -230,7 +230,6 @@ const setDog = async (req, res) => {
 
 // Function to handle searching a dog and incrementing it's age if it is found.
 const increaseAge = async (req, res) => {
-
   if (!req.body.name) {
     return res.status(400).json({ error: 'Name is required to perform a search' });
   }
